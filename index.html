@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game Củng Cố Tin Học</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🎮 Trò chơi củng cố Tin học</h1>
+
+    <!-- Bộ chọn nội dung -->
+    <div class="selector-box">
+      <div>
+        <label for="grade">Chọn khối lớp:</label>
+        <select id="grade">
+          <option value="10">Lớp 10</option>
+          <option value="11">Lớp 11</option>
+          <option value="12">Lớp 12</option>
+        </select>
+      </div>
+      
+      <div>
+        <label for="topic">Chọn chủ đề:</label>
+        <select id="topic"></select>
+      </div>
+
+      <div>
+        <label for="lesson">Chọn bài:</label>
+        <select id="lesson"></select>
+      </div>
+    </div>
+
+    <button id="startBtn">Bắt đầu củng cố</button>
+
+    <!-- Khu vực câu hỏi -->
+    <div id="quizArea">
+      <div id="questionText"></div>
+      <div id="answers"></div>
+    </div>
+
+    <!-- Kết quả -->
+    <div id="resultBox">
+      <h2>Kết quả</h2>
+      <p id="scoreText"></p>
+      <button id="retryBtn">Chơi lại</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
