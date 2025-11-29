@@ -1,5 +1,5 @@
 /* ==============================
-   SCRIPT.JS – GAME CỦNG CỐ TIN HỌC
+   SCRIPT.JS – GAME CỦNG CỐ TIN HỌC (HOÀN CHỈNH)
    Tải dữ liệu từ Excel (SheetJS)
    ============================== */
 
@@ -27,12 +27,20 @@ const retryBtn = document.getElementById("retryBtn");
    1) TẢI FILE EXCEL – sử dụng SheetJS
 ========================================== */
 async function loadExcel() {
-  const file = await fetch(EXCEL_FILE);
-  const data = await file.arrayBuffer();
-  const workbook = XLSX.read(data);
-  const sheet = workbook.Sheets[workbook.SheetNames[0]];
-  allData = XLSX.utils.sheet_to_json(sheet);
-  buildSelectors();
+  try {
+    const file = await fetch(EXCEL_FILE);
+    const data = await file.arrayBuffer();
+    const workbook = XLSX.read(data);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    allData = XLSX.utils.sheet_to_json(sheet);
+
+    console.log("Dữ liệu Excel:", allData);
+
+    buildSelectors();
+  } catch (error) {
+    console.error("Lỗi load Excel:", error);
+    alert("Không thể load file Excel. Hãy kiểm tra đường dẫn.");
+  }
 }
 
 /* ==========================================
@@ -46,9 +54,8 @@ function buildSelectors() {
 
 function updateTopics() {
   const grade = gradeSelect.value;
-
   const topics = [...new Set(allData
-    .filter(q => q.Khoi == grade)
+    .filter(q => String(q.Khoi) === String(grade))
     .map(q => q.ChuDe)
   )];
 
@@ -59,9 +66,8 @@ function updateTopics() {
 function updateLessons() {
   const grade = gradeSelect.value;
   const topic = topicSelect.value;
-
   const lessons = [...new Set(allData
-    .filter(q => q.Khoi == grade && q.ChuDe == topic)
+    .filter(q => String(q.Khoi) === String(grade) && q.ChuDe === topic)
     .map(q => q.Bai)
   )];
 
@@ -77,7 +83,7 @@ startBtn.addEventListener("click", () => {
   const lesson = lessonSelect.value;
 
   filteredQuestions = allData.filter(q => 
-    q.Khoi == grade && q.ChuDe == topic && q.Bai == lesson
+    String(q.Khoi) === String(grade) && q.ChuDe === topic && q.Bai === lesson
   );
 
   if (filteredQuestions.length === 0) {
@@ -104,6 +110,7 @@ function showQuestion() {
   const answers = [q.A, q.B, q.C, q.D];
 
   answers.forEach((text, i) => {
+    if (!text) return; // bỏ đáp án trống
     const div = document.createElement("div");
     div.className = "answer";
     div.textContent = text;
