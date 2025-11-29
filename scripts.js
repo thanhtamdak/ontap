@@ -1,10 +1,11 @@
 /* ==============================
    SCRIPT.JS – GAME CỦNG CỐ TIN HỌC (HOÀN CHỈNH)
-   Tải dữ liệu từ Excel (SheetJS)
+   Hỗ trợ chạy local hoặc fetch Excel từ server
    ============================== */
 
-// Đường dẫn đến file Excel
-const EXCEL_FILE = "questions.xlsx";
+// Nếu dùng JSON: const EXCEL_FILE = "questions.json";
+// Nếu dùng server Node.js có route /questions: const EXCEL_FILE = "/questions";
+const EXCEL_FILE = "questions.xlsx"; // đổi sang JSON nếu cần
 
 let allData = []; // Dữ liệu toàn bộ câu hỏi
 let filteredQuestions = []; // Câu hỏi theo bộ chọn
@@ -24,27 +25,29 @@ const scoreText = document.getElementById("scoreText");
 const retryBtn = document.getElementById("retryBtn");
 
 /* ==========================================
-   1) TẢI FILE EXCEL – sử dụng SheetJS
+   1) TẢI FILE EXCEL / JSON
 ========================================== */
-async function loadExcel() {
+async function loadData() {
   try {
-    const file = await fetch(EXCEL_FILE);
-    const data = await file.arrayBuffer();
-    const workbook = XLSX.read(data);
-    const sheet = workbook.Sheets[workbook.SheetNames[0]];
-    allData = XLSX.utils.sheet_to_json(sheet);
-
-    console.log("Dữ liệu Excel:", allData);
-
+    const response = await fetch(EXCEL_FILE);
+    if (EXCEL_FILE.endsWith(".json")) {
+      allData = await response.json();
+    } else {
+      const data = await response.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      allData = XLSX.utils.sheet_to_json(sheet);
+    }
+    console.log("Dữ liệu Excel/JSON:", allData);
     buildSelectors();
   } catch (error) {
-    console.error("Lỗi load Excel:", error);
-    alert("Không thể load file Excel. Hãy kiểm tra đường dẫn.");
+    console.error("Lỗi load dữ liệu:", error);
+    alert("Không thể load file dữ liệu. Hãy kiểm tra đường dẫn.");
   }
 }
 
 /* ==========================================
-   2) TẠO DANH SÁCH CHỦ ĐỀ + BÀI
+   2) XÂY DỰNG DROPDOWN
 ========================================== */
 function buildSelectors() {
   updateTopics();
@@ -82,8 +85,10 @@ startBtn.addEventListener("click", () => {
   const topic = topicSelect.value;
   const lesson = lessonSelect.value;
 
-  filteredQuestions = allData.filter(q => 
-    String(q.Khoi) === String(grade) && q.ChuDe === topic && q.Bai === lesson
+  filteredQuestions = allData.filter(q =>
+    String(q.Khoi) === String(grade) &&
+    q.ChuDe === topic &&
+    q.Bai === lesson
   );
 
   if (filteredQuestions.length === 0) {
@@ -155,5 +160,7 @@ retryBtn.addEventListener("click", () => {
   resultBox.style.display = "none";
 });
 
-// Khởi động
-loadExcel();
+/* ==========================================
+   7) Khởi động
+========================================== */
+loadData();
